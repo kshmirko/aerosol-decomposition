@@ -1,6 +1,8 @@
 package components
 
 import (
+	"log"
+
 	"gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
 )
 
@@ -16,7 +18,7 @@ func (am AerosolModeMix) MeanRadius() float64 {
 		total += am[i].N
 	}
 	rmean /= total
-	return total
+	return rmean
 }
 
 // Area -  возвращает площадь поверхности частиц аэрозольного распределения
@@ -35,11 +37,12 @@ func (am AerosolModeMix) Volume() float64 {
 		volume += am[i].Volume()
 	}
 
-	return float64(volume)
+	return volume
 }
 
 // EffectiveRadius - возвращает эффективный радиус аэрозольного распределения
 func (am AerosolModeMix) EffectiveRadius() float64 {
+
 	total := 0.0
 	rmean := 0.0
 	for i := range am {
@@ -47,7 +50,29 @@ func (am AerosolModeMix) EffectiveRadius() float64 {
 		total += am[i].N
 	}
 	rmean /= total
-	return total
+	return rmean
+}
+
+// RefrReIdx - действительная часть показателя преломления смеси
+func (am AerosolModeMix) RefrReIdx() utils.Vector {
+	ret := make(utlis.Vector, len(am[0].Ext))
+
+	vol := am.Volume()
+	for _, ami := range am {
+		utlis.AddVScale(ret, ami.RefrReIdx(), 1.0/vol)
+	}
+	return ret
+}
+
+// RefrImIdx - мнимая часть показателя преломления смеси
+func (am AerosolModeMix) RefrImIdx() utils.Vector {
+	ret := make(utils.Vector, len(am[0].Ext))
+
+	vol := am.Volume()
+	for _, ami := range am {
+		utlis.AddVScale(ret, ami.RefrImIdx(), 1.0/vol)
+	}
+	return ret
 }
 
 // Value - возвращает функцию распределения по заданной смеси
@@ -64,26 +89,48 @@ func (am AerosolModeMix) Value(r []float64) []float64 {
 	return ret
 }
 
-func (am AerosolModeMix) Ext() Vector {
-	ret := make(Vector, len(am[0].Ext))
+// Ext - коэффициенты ослабления смеси
+func (am AerosolModeMix) Ext() utils.Vector {
+	ret := make(utils.Vector, len(am[0].Ext))
 	for _, v := range am {
 		ret = utlis.Add(ret, v.Extinction())
 	}
 	return ret
 }
 
-func (am AerosolModeMix) Bck() Vector {
-	ret := make(Vector, len(am[0].Ext))
+// Bck -  коэффициеты обратного рассеяния смеси
+func (am AerosolModeMix) Bck() utils.Vector {
+	ret := make(utils.Vector, len(am[0].Ext))
 	for _, v := range am {
 		ret = utlis.Add(ret, v.Backscatter())
 	}
 	return ret
 }
 
-func (am AerosolModeMix) B22() Vector {
-	ret := make(Vector, len(am[0].Ext))
+// B22 - коэффициенты b22 смеси
+func (am AerosolModeMix) B22() utils.Vector {
+	ret := make(utils.Vector, len(am[0].Ext))
 	for _, v := range am {
 		ret = utlis.Add(ret, v.Backscatter22())
 	}
+	return ret
+}
+
+// F - Целевая функция подгона
+func (am AerosolModeMix) F(x utils.Vector) utils.Vector {
+	if len(am) != len(x) {
+		log.Fatal("Количество компонентов смеси должно быть равно числу параметров x")
+	}
+	for i := range x {
+		am[i].N = x[i]
+	}
+	b := am.Bck()
+	e := am.Ext()
+	b22 := am.B22()
+	re := am.RefrReIdx()
+	im := am.RefrImIdx()
+	dep := utlis.CalcDep(b, b22)
+
+	ret := utils.Vector{b[0], b[1], b[2], e[0], e[1], dep[1], re[1], im[1]}
 	return ret
 }

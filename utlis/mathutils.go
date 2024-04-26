@@ -1,6 +1,9 @@
 package utlis
 
-import "math"
+import (
+	"log"
+	"math"
+)
 
 func LogSpace(r0, r1 float64, N int) ([]float64, float64) {
 	r := make([]float64, N)
@@ -35,6 +38,29 @@ func Add(a, b []float64) []float64 {
 	ret := make([]float64, len(a))
 	for i := range a {
 		ret[i] = a[i] + b[i]
+	}
+	return ret
+}
+
+func AddVScale(y, x []float64, a float64) {
+	if len(y) != len(x) {
+		log.Fatal("len(x) should be equal to len(y)")
+	}
+
+	for i := range y {
+		y[i] = y[i] + (a * x[i])
+	}
+}
+
+func CalcDep(b11, b22 []float64) []float64 {
+	if len(b11) != len(b22) {
+		log.Fatalln("Should be len(b11)==len(b22)")
+	}
+
+	ret := make([]float64, len(b11))
+
+	for i := range ret {
+		ret[i] = (b11[i] - b22[i]) / (b11[i] + b22[i])
 	}
 	return ret
 }

@@ -2,16 +2,13 @@ package components
 
 import (
 	"math"
+
+	"gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
 )
 
 // Lognormal size distribution
 // f(x) = 1/(sqrt(2pi)*x*ln(s))exp(-0.5*(ln(x)-ln(xm))**2/(ln(s)**2))
 const DIM_SIZE int = 3
-
-type RVector3D [DIM_SIZE]float64
-type CVector3D [DIM_SIZE]complex128
-type Vector []float64
-type CVector []complex128
 
 // AerosolMode - описывает форму распределения по размерам
 type AerosolMode struct {
@@ -36,7 +33,7 @@ func (am AerosolMode) EffectiveRadius() float64 {
 	return am.Rm * math.Exp(2.5*math.Pow(math.Log(am.Sigma), 2))
 }
 
-func (am AerosolMode) Value(r []float64) []float64 {
+func (am AerosolMode) Value(r utlis.Vector) utlis.Vector {
 	ret := make([]float64, len(r))
 	A := 1.0 / (math.Sqrt(math.Pi*2) * math.Log(am.Sigma))
 	for i := range r {

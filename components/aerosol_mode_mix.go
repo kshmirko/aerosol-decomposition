@@ -1,13 +1,25 @@
 package components
 
 import (
+	"fmt"
 	"log"
 
-	"gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
+	//"gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
+	utils "gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
 )
 
 // AerosolModeMix - тип аэрозольной смеси
 type AerosolModeMix []AerosolModeMixItem
+
+func (amx *AerosolModeMix) SetCoefs(x utils.Vector) {
+	if len(*amx) != len(x) {
+		log.Fatal("Number of components in mixtuer and length of the x array should be equal")
+	}
+
+	for i := range x {
+		(*amx)[i].N = x[i]
+	}
+}
 
 // MeanRadius - возвращает средний радиус аэрозольной смеси
 func (am AerosolModeMix) MeanRadius() float64 {
@@ -55,11 +67,11 @@ func (am AerosolModeMix) EffectiveRadius() float64 {
 
 // RefrReIdx - действительная часть показателя преломления смеси
 func (am AerosolModeMix) RefrReIdx() utils.Vector {
-	ret := make(utlis.Vector, len(am[0].Ext))
+	ret := make(utils.Vector, len(am[0].Ext))
 
 	vol := am.Volume()
 	for _, ami := range am {
-		utlis.AddVScale(ret, ami.RefrReIdx(), 1.0/vol)
+		utils.AddVScale(ret, ami.RefrReIdx(), 1.0/vol)
 	}
 	return ret
 }
@@ -70,7 +82,7 @@ func (am AerosolModeMix) RefrImIdx() utils.Vector {
 
 	vol := am.Volume()
 	for _, ami := range am {
-		utlis.AddVScale(ret, ami.RefrImIdx(), 1.0/vol)
+		utils.AddVScale(ret, ami.RefrImIdx(), 1.0/vol)
 	}
 	return ret
 }
@@ -93,7 +105,7 @@ func (am AerosolModeMix) Value(r []float64) []float64 {
 func (am AerosolModeMix) Ext() utils.Vector {
 	ret := make(utils.Vector, len(am[0].Ext))
 	for _, v := range am {
-		ret = utlis.Add(ret, v.Extinction())
+		ret = utils.Add(ret, v.Extinction())
 	}
 	return ret
 }
@@ -102,7 +114,7 @@ func (am AerosolModeMix) Ext() utils.Vector {
 func (am AerosolModeMix) Bck() utils.Vector {
 	ret := make(utils.Vector, len(am[0].Ext))
 	for _, v := range am {
-		ret = utlis.Add(ret, v.Backscatter())
+		ret = utils.Add(ret, v.Backscatter())
 	}
 	return ret
 }
@@ -111,7 +123,7 @@ func (am AerosolModeMix) Bck() utils.Vector {
 func (am AerosolModeMix) B22() utils.Vector {
 	ret := make(utils.Vector, len(am[0].Ext))
 	for _, v := range am {
-		ret = utlis.Add(ret, v.Backscatter22())
+		ret = utils.Add(ret, v.Backscatter22())
 	}
 	return ret
 }
@@ -129,8 +141,15 @@ func (am AerosolModeMix) F(x utils.Vector) utils.Vector {
 	b22 := am.B22()
 	re := am.RefrReIdx()
 	im := am.RefrImIdx()
-	dep := utlis.CalcDep(b, b22)
+	dep := utils.CalcDep(b, b22)
 
 	ret := utils.Vector{b[0], b[1], b[2], e[0], e[1], dep[1], re[1], im[1]}
 	return ret
+}
+
+func (am AerosolModeMix) PrintComponents() {
+	for i := range am {
+		fmt.Printf("Comp #%2d = %7s\t", i, am[i].Title)
+	}
+	fmt.Println()
 }

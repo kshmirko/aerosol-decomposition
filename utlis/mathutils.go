@@ -5,6 +5,7 @@ import (
 	"math"
 )
 
+// LogSpace - создание логарифмически эквидистантного вектора диной N на интервале [r0;r1]
 func LogSpace(r0, r1 float64, N int) ([]float64, float64) {
 	r := make([]float64, N)
 	lgr0 := math.Log10(r0)
@@ -18,6 +19,7 @@ func LogSpace(r0, r1 float64, N int) ([]float64, float64) {
 	return r, dlgr
 }
 
+// Trapz - вычисление интеграла методом трапеций
 func Trapz(x, y []float64) float64 {
 	sum := 0.0
 	for i := 0; i < len(x)-1; i++ {
@@ -52,6 +54,7 @@ func AddVScale(y, x []float64, a float64) {
 	}
 }
 
+// CalcDep - вычисление деполяризационного отношения
 func CalcDep(b11, b22 []float64) []float64 {
 	if len(b11) != len(b22) {
 		log.Fatalln("Should be len(b11)==len(b22)")

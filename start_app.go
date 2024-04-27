@@ -5,7 +5,8 @@ import (
 	"fmt"
 
 	"gitflic.ru/project/physicist2018/aerosol-decomposition/components"
-	"gitflic.ru/project/physicist2018/aerosol-decomposition/utils"
+	"gitflic.ru/project/physicist2018/aerosol-decomposition/solver"
+	"gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
 )
 
 func main() {
@@ -21,32 +22,17 @@ func main() {
 
 	db.PrintTable()
 
-	amix := components.AerosolModeMix{
-		components.AerosolModeMixItem{
-			OpticalCoefs: db[0],
-			N:            1000.0,
-		},
-		components.AerosolModeMixItem{
-			OpticalCoefs: db[2],
-			N:            10.0,
-		},
-		components.AerosolModeMixItem{
-			OpticalCoefs: db[1],
-			N:            0.4,
-		},
-	}
+	y := utlis.Vector{3.66e-06, 1.69e-06, 3.26e-07, 8.31e-05, 4.68e-05, 0.0543}
+	ret := solver.FindSolutionDE(&db, y)
 
-	fmt.Printf("Mean radius      : %.3e\n", amix.MeanRadius())
-	fmt.Printf("Effective radius : %.3e\n", amix.EffectiveRadius())
-	fmt.Printf("Area             : %.3e\n", amix.Area())
-	fmt.Printf("Volume           : %.3e\n", amix.Volume())
+	fmt.Printf("Resulting error: %.2f%%\n", ret.Err*100.0)
+	fmt.Printf("X = %.2f\n", ret.Xsol)
+	ret.Mix.PrintComponents()
 
-	fmt.Printf("%.3f\n", amix.RefrReIdx())
-	fmt.Printf("%.4f\n", amix.RefrImIdx())
-
-	fmt.Printf("%.2e\n", amix.F(utils.Vector{1000.0, 0.1, 100}))
-
-	//db := components.GenerateDB()
-	//components.StoreDB("test.json", &db)
+	fmt.Printf("Rmean = %.3f, Reff = %.3f, Mre = %7.2f, Mim=%8.3f\n",
+		ret.Mix.MeanRadius(),
+		ret.Mix.EffectiveRadius(),
+		ret.Mix.RefrReIdx()[1],
+		ret.Mix.RefrImIdx()[1])
 
 }

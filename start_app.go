@@ -8,6 +8,7 @@ import (
 
 	"gitflic.ru/project/physicist2018/aerosol-decomposition/components"
 	"gitflic.ru/project/physicist2018/aerosol-decomposition/measurements"
+	"gitflic.ru/project/physicist2018/aerosol-decomposition/plots"
 	"gitflic.ru/project/physicist2018/aerosol-decomposition/solver"
 	"gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
 )
@@ -65,10 +66,11 @@ func main() {
 
 	avg := meas.MakeAverage()
 	avg.Print1()
-
 	sols := solver.NewSolutions(meas.Len() + 1)
 
 	sols = DoSolve(avg, sol, db, mustlog, sols)
+
+	plots.PlotY(avg.Data, sols[0].Yh, "#pts", "f(x)", "Optical coefs", "Average.pdf")
 	new_db := db
 	//sols[0].GetOptDb()
 

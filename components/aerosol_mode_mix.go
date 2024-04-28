@@ -55,14 +55,14 @@ func (am AerosolModeMix) Volume() float64 {
 // EffectiveRadius - возвращает эффективный радиус аэрозольного распределения
 func (am AerosolModeMix) EffectiveRadius() float64 {
 
-	total := 0.0
-	rmean := 0.0
-	for i := range am {
-		rmean += am[i].EffectiveRadius() * am[i].N
-		total += am[i].N
-	}
-	rmean /= total
-	return rmean
+	// total := 0.0
+	// rmean := 0.0
+	// for i := range am {
+	// 	rmean += am[i].EffectiveRadius() * am[i].N
+	// 	total += am[i].N
+	// }
+	// rmean /= total
+	return 3 * am.Volume() / am.Area()
 }
 
 // RefrReIdx - действительная часть показателя преломления смеси

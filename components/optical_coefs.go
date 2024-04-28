@@ -2,6 +2,7 @@ package components
 
 import (
 	"fmt"
+	"slices"
 
 	"gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
 )
@@ -107,4 +108,21 @@ func (db OpticalDB) PrintTable() {
 	for i, dbi := range db {
 		fmt.Printf("%4d %10s %10.4f %10.4f %7.3f %7.4f\n", i, dbi.Title, dbi.AerosolMode.EffectiveRadius(), dbi.AerosolMode.MeanRadius(), dbi.MRe[1], dbi.MIm[1])
 	}
+	fmt.Printf("-----------------------------------------------------\n\n")
+}
+
+func (db OpticalDB) Filter(keys ElemKeys) OpticalDB {
+	ret := make(OpticalDB, 0, len(keys))
+
+	for _, k := range keys {
+		idx := slices.IndexFunc(db, func(key OpticalCoefs) bool {
+			return (key.Title == k.Title) && (key.Rh == k.Rh)
+		})
+		if idx != -1 {
+			ret = append(ret, db[idx])
+		}
+	}
+
+	return ret
+
 }

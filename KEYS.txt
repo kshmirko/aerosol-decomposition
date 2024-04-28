@@ -1,4 +1,3 @@
 WASO 0
 MINM 0
 MIAM 0
-SOOT 0

@@ -20,6 +20,8 @@ func main() {
 	mustlog := flag.Bool("log", false, "Показывать лог работы алгоритма?")
 	use_aggls := flag.Bool("aggls", false, "Использовать агломераты обломков для моделирования минерального аэрозоля?")
 	keysfile := flag.String("keys", "KEYS.txt", "Файл с наименованием исспользуемых компонентов")
+	plot_psd := flag.Bool("psdplot", false, "Создавать графики функции распределения")
+	plot_test := flag.Bool("testplot", false, "Создавать графики сравнения измеренных данных и восстановленных")
 	flag.Parse()
 
 	var db components.OpticalDB
@@ -70,7 +72,11 @@ func main() {
 
 	sols = DoSolve(avg, sol, db, mustlog, sols)
 
-	plots.PlotY(avg.Data, sols[0].Yh, "#pts", "f(x)", "Optical coefs", "Average.pdf")
+	_ = *plot_test
+	if *plot_test {
+		plots.PlotY(avg.Data, sols[0].Yh, "#pts", "f(x)", "Optical coefs", avg.Title+".pdf")
+	}
+
 	new_db := db
 	//sols[0].GetOptDb()
 

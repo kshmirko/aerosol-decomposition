@@ -90,7 +90,7 @@ func main() {
 
 		sols = DoSolve(mi, sol, new_db, mustlog, dep_scale, sols)
 		if *plot_test {
-			plots.PlotY(mi.Data, sols[i+1].Yh, "#pts", "f(x)", "Optical coefs", mi.Title+".pdf")
+			plots.Scatter(mi.Data, sols[i+1].Yh, "#pts", "f(x)", "Optical coefs", mi.Title+".pdf")
 		}
 
 		if *plot_psd {

@@ -44,6 +44,58 @@ func PlotY(y, yh utlis.Vector, xlab, ylab, title, fname string) error {
 		log.Fatal(err)
 	}
 	p.Add(line, scatter)
+	p.Legend.Add("measured", line)
+	p.Legend.Add("reconstructed", scatter)
+
+	err = p.Save(10*vg.Centimeter, 10*vg.Centimeter, fname)
+	if err != nil {
+		log.Panic(err)
+	}
+	return nil
+}
+
+func Scatter(y, yh utlis.Vector, xlab, ylab, title, fname string) error {
+	p := plot.New()
+	p.Title.Text = title
+	p.Y.Scale = plot.LogScale{}
+	p.Y.Tick.Marker = plot.LogTicks{Prec: 3}
+	p.X.Scale = plot.LogScale{}
+	p.X.Tick.Marker = plot.LogTicks{Prec: 3}
+
+	p.X.Label.Text = xlab
+	p.Y.Label.Text = ylab
+
+	plotter.DefaultLineStyle.Width = vg.Points(1)
+	plotter.DefaultGlyphStyle.Radius = vg.Points(3)
+
+	ptsy := make(plotter.XYs, 0, len(y))
+
+	for i := range y {
+		ptsy = append(ptsy, plotter.XY{
+			X: y[i],
+			Y: yh[i],
+		})
+	}
+
+	scatter, err := plotter.NewScatter(ptsy)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	line, err := plotter.NewLine(plotter.XYs{
+		plotter.XY{
+			X: 0.0000001,
+			Y: 0.0000001,
+		},
+		plotter.XY{
+			X: 0.5,
+			Y: 0.5,
+		},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	p.Add(scatter, line)
 
 	err = p.Save(10*vg.Centimeter, 10*vg.Centimeter, fname)
 	if err != nil {

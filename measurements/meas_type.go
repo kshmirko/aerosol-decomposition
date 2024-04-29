@@ -68,6 +68,7 @@ func LoadFromFile(fname string) (Measurements, error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		items := strings.Split(scanner.Text(), "\t")
+		items[0] = strings.ReplaceAll(items[0], ".", "_")
 		tmp := NewMeasurement(items[0])
 		for i := 1; i < len(items); i++ {
 			tmp.Data[i-1], _ = strconv.ParseFloat(items[i], 64)

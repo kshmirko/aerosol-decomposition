@@ -83,22 +83,27 @@ func (am AerosolModeMixItem) Backscatter22() utlis.Vector {
 
 // RefrReIdx - действительная часть коэффициента преломления
 func (am AerosolModeMixItem) RefrReIdx() utlis.Vector {
-	ret := make(utlis.Vector, DIM_SIZE)
-	vol := am.Volume()
-	for i, m := range am.MRe {
-		ret[i] = vol * m
-	}
-	return ret
+	// ret := make(utlis.Vector, DIM_SIZE)
+	// vol := am.Volume()
+	// for i, m := range am.MRe {
+	// 	ret[i] = vol * m
+	// }
+
+	return am.OpticalCoefs.MRe
 }
 
 // RefrImIdx - мнимая часть коэффициента преломления
 func (am AerosolModeMixItem) RefrImIdx() utlis.Vector {
-	ret := make(utlis.Vector, DIM_SIZE)
-	vol := am.Volume()
-	for i, m := range am.MIm {
-		ret[i] = vol * m
-	}
-	return ret
+	// ret := make(utlis.Vector, DIM_SIZE)
+	// vol := am.Volume()
+	// for i, m := range am.MIm {
+	// 	ret[i] = vol * m
+	// }
+	return am.OpticalCoefs.MIm
+}
+
+func (am AerosolModeMixItem) Number() float64 {
+	return am.N
 }
 
 func (db OpticalDB) PrintTable() {

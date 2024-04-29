@@ -3,6 +3,7 @@ package components
 import (
 	"fmt"
 	"log"
+	"math"
 
 	//"gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
 	utils "gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
@@ -42,6 +43,14 @@ func (am AerosolModeMix) Area() float64 {
 	return area
 }
 
+func (am AerosolModeMix) Number() float64 {
+	number := 0.0
+	for i := range am {
+		number += am[i].Number()
+	}
+	return number
+}
+
 // Volume - возвращает объем частиц аэрозольного распределения
 func (am AerosolModeMix) Volume() float64 {
 	volume := 0.0
@@ -71,7 +80,7 @@ func (am AerosolModeMix) RefrReIdx() utils.Vector {
 
 	vol := am.Volume()
 	for _, ami := range am {
-		utils.AddVScale(ret, ami.RefrReIdx(), 1.0/vol)
+		utils.AddVScale(ret, ami.RefrReIdx(), ami.Volume()/vol)
 	}
 	return ret
 }
@@ -82,7 +91,7 @@ func (am AerosolModeMix) RefrImIdx() utils.Vector {
 
 	vol := am.Volume()
 	for _, ami := range am {
-		utils.AddVScale(ret, ami.RefrImIdx(), 1.0/vol)
+		utils.AddVScale(ret, ami.RefrImIdx(), ami.Volume()/vol)
 	}
 	return ret
 }
@@ -96,6 +105,17 @@ func (am AerosolModeMix) Value(r []float64) []float64 {
 		for j := range r {
 			ret[j] += tmp[j]
 		}
+	}
+
+	return ret
+}
+
+func (am AerosolModeMix) ValueVol(r []float64) []float64 {
+	ret := make([]float64, len(r))
+	psd := am.Value(r)
+
+	for j := range r {
+		ret[j] = psd[j] * 4.189 * math.Pow(r[j], 3.0)
 	}
 
 	return ret

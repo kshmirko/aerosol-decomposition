@@ -14,14 +14,14 @@ import (
 )
 
 func main() {
-	//dbfile := flag.String("dbfile", "db.json", "Имя json файла с базой данных оптических свойств частиц")
 	inpfile := flag.String("in", "data.txt", "Имя файла с данными")
-	algorithm := flag.String("alg", "spso", "Название используемого алгоритма spso или de или denm. \nspso - метод роя частиц, \nde - метод дифференциальной эволюции, \ndenm - метод дифференциальной эфолюции + уточнение симплекс-методом.")
+	algorithm := flag.String("alg", "denm", "Название используемого алгоритма spso или de или denm. \nspso - метод роя частиц, \nde - метод дифференциальной эволюции, \ndenm - метод дифференциальной эфолюции + уточнение симплекс-методом.")
 	mustlog := flag.Bool("log", false, "Показывать лог работы алгоритма?")
 	use_aggls := flag.Bool("aggls", false, "Использовать агломераты обломков для моделирования минерального аэрозоля?")
 	keysfile := flag.String("keys", "KEYS.txt", "Файл с наименованием исспользуемых компонентов")
 	plot_psd := flag.Bool("psdplot", false, "Создавать графики функции распределения")
 	plot_test := flag.Bool("testplot", false, "Создавать графики сравнения измеренных данных и восстановленных")
+	dep_scale := flag.Float64("dep-scale-fact", 1.0, "Весовой коэффициент. Изменяет роль деполяризации в суммарной невязке.\nПараметр может принимать значения на отрезке [0.0, 1.0]")
 	flag.Parse()
 
 	var db components.OpticalDB
@@ -34,6 +34,12 @@ func main() {
 		db = components.GenerateDB()
 	}
 	//}
+
+	if *dep_scale < 0 {
+		*dep_scale = 0.0
+	} else if *dep_scale > 1.0 {
+		*dep_scale = 1.0
+	}
 
 	// Определяем выбор алгоритма глобальной оптимизации
 	sol := solver.FindSolution
@@ -57,6 +63,7 @@ func main() {
 	}
 	db = db.Filter(keys)
 	fmt.Println(len(keys))
+
 	// Загружаем информацию об измерениях
 	meas, err := measurements.LoadFromFile(*inpfile)
 
@@ -70,38 +77,41 @@ func main() {
 	avg.Print1()
 	sols := solver.NewSolutions(meas.Len() + 1)
 
-	sols = DoSolve(avg, sol, db, mustlog, sols)
+	sols = DoSolve(avg, sol, db, mustlog, dep_scale, sols)
 
-	_ = *plot_test
+	_ = *plot_psd
 	if *plot_test {
 		plots.PlotY(avg.Data, sols[0].Yh, "#pts", "f(x)", "Optical coefs", avg.Title+".pdf")
 	}
 
 	new_db := db
-	//sols[0].GetOptDb()
+	R, _ := utlis.LogSpace(0.005, 15.0, 30)
+	for i, mi := range meas {
 
-	for _, mi := range meas {
+		sols = DoSolve(mi, sol, new_db, mustlog, dep_scale, sols)
+		if *plot_test {
+			plots.PlotY(mi.Data, sols[i+1].Yh, "#pts", "f(x)", "Optical coefs", mi.Title+".pdf")
+		}
 
-		sols = DoSolve(mi, sol, new_db, mustlog, sols)
+		if *plot_psd {
+			Y := sols[i+1].Mix.ValueVol(R)
+			plots.PlotXY(R, Y, "Radius, um", "dV/dr", "Volume distribution", "psd-"+mi.Title+".pdf")
+		}
 	}
 
 	fmt.Println("Len = ", len(sols))
 }
 
-func DoSolve(mi measurements.Measurement, sol func(db *components.OpticalDB, y0 utlis.Vector, mustlog bool) solver.SolutionType, db components.OpticalDB, mustlog *bool, sols solver.Solutions) solver.Solutions {
-	//fmt.Printf("\nОбработка данных с нзванием %s\n", mi.Title)
+func DoSolve(mi measurements.Measurement,
+	sol func(db *components.OpticalDB, y0 utlis.Vector, mustlog bool, dep_scale float64) solver.SolutionType,
+	db components.OpticalDB,
+	mustlog *bool,
+	dep_scale *float64,
+	sols solver.Solutions) solver.Solutions {
 
-	ret := sol(&db, mi.Data, *mustlog)
+	ret := sol(&db, mi.Data, *mustlog, *dep_scale)
+
 	sols = append(sols, ret)
 	ret.Print(mi.Title)
-	// fmt.Printf("Resulting error: %.2f%%\n", ret.Err*100.0)
-	// fmt.Printf("X = %.2f\n", ret.Xsol)
-	// ret.Mix.PrintComponents()
-
-	// fmt.Printf("Rmean = %.3f, Reff = %.3f, Mre = %7.2f, Mim=%8.3f\n",
-	// 	ret.Mix.MeanRadius(),
-	// 	ret.Mix.EffectiveRadius(),
-	// 	ret.Mix.RefrReIdx()[1],
-	// 	ret.Mix.RefrImIdx()[1])
 	return sols
 }

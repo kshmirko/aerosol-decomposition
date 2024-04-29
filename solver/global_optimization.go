@@ -14,10 +14,14 @@ import (
 
 const MAX_COMPS int = 3
 
-func GetNormL2(yh, y0 utlis.Vector) float64 {
+func GetNormL2(yh, y0 utlis.Vector, dep_scale float64) float64 {
 	tot := 0.0
 	for i := range y0 {
-		tot += math.Pow((y0[i]-yh[i])/y0[i], 2)
+		if i == 5 {
+			tot += dep_scale * math.Pow((y0[i]-yh[i])/y0[i], 2)
+		} else {
+			tot += math.Pow((y0[i]-yh[i])/y0[i], 2)
+		}
 	}
 	return math.Sqrt(tot) / float64(len(y0))
 }
@@ -30,7 +34,7 @@ func GetNormL1(yh, y0 utlis.Vector) float64 {
 	return tot / float64(len(y0))
 }
 
-func FindSolution(db *components.OpticalDB, y0 utlis.Vector, mustlog bool) SolutionType {
+func FindSolution(db *components.OpticalDB, y0 utlis.Vector, mustlog bool, dep_scale float64) SolutionType {
 	combs := combinations.Combinations(*db, MAX_COMPS)
 
 	score := make([]SolutionType, len(combs))
@@ -65,7 +69,7 @@ func FindSolution(db *components.OpticalDB, y0 utlis.Vector, mustlog bool) Solut
 				}
 			}
 			yh := mix.F(x)
-			return GetNormL2(yh, y0) + float64(penalty)
+			return GetNormL2(yh, y0, dep_scale) + float64(penalty)
 		}
 
 		xsol, yerr, err := spso.Minimize(F, uint(MAX_COMPS))
@@ -92,7 +96,7 @@ func FindSolution(db *components.OpticalDB, y0 utlis.Vector, mustlog bool) Solut
 
 }
 
-func FindSolutionDE(db *components.OpticalDB, y0 utlis.Vector, mustlog bool) SolutionType {
+func FindSolutionDE(db *components.OpticalDB, y0 utlis.Vector, mustlog bool, dep_scale float64) SolutionType {
 	combs := combinations.Combinations(*db, MAX_COMPS)
 
 	score := make([]SolutionType, len(combs))
@@ -127,7 +131,7 @@ func FindSolutionDE(db *components.OpticalDB, y0 utlis.Vector, mustlog bool) Sol
 				}
 			}
 			yh := mix.F(x)
-			return GetNormL2(yh, y0) + float64(penalty)
+			return GetNormL2(yh, y0, dep_scale) + float64(penalty)
 		}
 
 		xsol, yerr, err := spso.Minimize(F, uint(MAX_COMPS))
@@ -154,7 +158,7 @@ func FindSolutionDE(db *components.OpticalDB, y0 utlis.Vector, mustlog bool) Sol
 
 }
 
-func FindSolutionDENM(db *components.OpticalDB, y0 utlis.Vector, mustlog bool) SolutionType {
+func FindSolutionDENM(db *components.OpticalDB, y0 utlis.Vector, mustlog bool, dep_scale float64) SolutionType {
 	combs := combinations.Combinations(*db, MAX_COMPS)
 
 	score := make([]SolutionType, len(combs))
@@ -190,7 +194,7 @@ func FindSolutionDENM(db *components.OpticalDB, y0 utlis.Vector, mustlog bool) S
 				}
 			}
 			yh := mix.F(x)
-			return GetNormL2(yh, y0) + float64(penalty)
+			return GetNormL2(yh, y0, dep_scale) + float64(penalty)
 		}
 
 		xsol, yerr, _ := spso.Minimize(F, uint(MAX_COMPS))

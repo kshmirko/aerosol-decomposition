@@ -52,7 +52,7 @@ func main() {
 	} else {
 		log.Fatal("Неизвстный алгоритм")
 	}
-	log.Printf("\nВ качестве решателя используется алгоритм %s\n", *algorithm)
+	fmt.Printf("\nВ качестве решателя используется алгоритм %s\n", *algorithm)
 
 	// Выводим информацию об используемых типах
 	db.PrintTable()
@@ -62,7 +62,6 @@ func main() {
 		log.Fatal(err)
 	}
 	db = db.Filter(keys)
-	fmt.Println(len(keys))
 
 	// Загружаем информацию об измерениях
 	meas, err := measurements.LoadFromFile(*inpfile)
@@ -77,6 +76,8 @@ func main() {
 	avg.Print1()
 	sols := solver.NewSolutions(meas.Len() + 1)
 
+	fmt.Printf("     Title       Err  [        X1         X2         X3]      C1      C2      C3      Rmean       Reff        Mre        Mim\n")
+	fmt.Printf("     -----       ---  [        --         --         --]      --      --      --      -----       ----        ---        ---\n")
 	sols = DoSolve(avg, sol, db, mustlog, dep_scale, sols)
 
 	_ = *plot_psd
@@ -99,7 +100,34 @@ func main() {
 		}
 	}
 
-	fmt.Println("Len = ", len(sols))
+	fmt.Println()
+	meas = append(measurements.Measurements{avg}, meas...)
+	//fmt.Printf("%8s ", "Average")
+	fmt.Println("Исходные данные:")
+	for i := range meas {
+		fmt.Printf("%8s  ", meas[i].Title)
+	}
+	fmt.Println()
+	for i := range avg.Data {
+		for j := range meas {
+			fmt.Printf("%.2e  ", meas[j].Data[i])
+		}
+		fmt.Println()
+	}
+	fmt.Println()
+	fmt.Println("Восстановленные данные:")
+	//fmt.Printf("%8s ", "Average")
+	for i := range meas {
+		fmt.Printf("%8s  ", meas[i].Title)
+	}
+	fmt.Println()
+	for i := range avg.Data {
+		for j := range sols {
+			fmt.Printf("%.2e  ", sols[j].Yh[i])
+		}
+		fmt.Println()
+	}
+
 }
 
 func DoSolve(mi measurements.Measurement,

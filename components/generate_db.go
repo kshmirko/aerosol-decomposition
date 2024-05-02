@@ -28,6 +28,34 @@ func GenerateDB() OpticalDB {
 		},
 		OpticalCoefs{
 			AerosolMode: AerosolMode{
+				Title: "WASO",
+				Rm:    2.62e-2,
+				Sigma: 2.24,
+			},
+			Rh:  50,
+			Wvl: utils.Vector{0.355, 0.532, 1.064},
+			Ext: utils.Vector{1.12e-8, 6.37e-09, 2.3e-09},
+			Bck: utils.Vector{2.02e-10, 1.12e-10, 4.53e-11},
+			B22: utils.Vector{2.02e-10, 1.12e-10, 4.53e-11},
+			MRe: utils.Vector{1.442e+00, 1.437e+00, 1.429e+00},
+			MIm: utils.Vector{2.640e-03, 3.180e-03, 8.210e-03},
+		},
+		OpticalCoefs{
+			AerosolMode: AerosolMode{
+				Title: "WASO",
+				Rm:    2.85e-2,
+				Sigma: 2.24,
+			},
+			Rh:  70,
+			Wvl: utils.Vector{0.355, 0.532, 1.064},
+			Ext: utils.Vector{1.37e-8, 7.91e-09, 2.91e-09},
+			Bck: utils.Vector{2.24e-10, 1.28e-10, 5.44e-11},
+			B22: utils.Vector{2.24e-10, 1.28e-10, 5.44e-11},
+			MRe: utils.Vector{1.420e+00, 1.414e+00, 1.406e+00},
+			MIm: utils.Vector{2.058e-03, 2.470e-03, 6.381e-03},
+		},
+		OpticalCoefs{
+			AerosolMode: AerosolMode{
 				Title: "INSO",
 				Rm:    0.471,
 				Sigma: 2.51,

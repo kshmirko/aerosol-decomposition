@@ -22,6 +22,7 @@ func main() {
 	plot_psd := flag.Bool("psdplot", false, "Создавать графики функции распределения")
 	plot_test := flag.Bool("testplot", false, "Создавать графики сравнения измеренных данных и восстановленных")
 	dep_scale := flag.Float64("dep-scale-fact", 1.0, "Весовой коэффициент. Изменяет роль деполяризации в суммарной невязке.\nПараметр может принимать значения на отрезке [0.0, 1.0]")
+	//rel_hum := flag.Int("hum", 0, "Относительная влажность для компонентов")
 	flag.Parse()
 
 	var db components.OpticalDB
@@ -62,7 +63,6 @@ func main() {
 		log.Fatal(err)
 	}
 	db = db.Filter(keys)
-
 	// Загружаем информацию об измерениях
 	meas, err := measurements.LoadFromFile(*inpfile)
 

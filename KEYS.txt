@@ -1,3 +1,4 @@
 WASO 0
 MINM 0
 MIAM 0
+INSO 0

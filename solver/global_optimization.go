@@ -203,15 +203,15 @@ func FindSolutionDENM(db *components.OpticalDB, y0 utlis.Vector, mustlog bool, d
 		opts.Constraints = []neldermead.Constraint{
 			{
 				Min: 0.0,
-				Max: 100000.0,
+				Max: 1000000.0,
 			},
 			{
 				Min: 0.0,
-				Max: 100000.0,
+				Max: 1000000.0,
 			},
 			{
 				Min: 0.0,
-				Max: 100000.0,
+				Max: 1000000.0,
 			},
 		}
 

@@ -76,8 +76,8 @@ func main() {
 	avg.Print1()
 	sols := solver.NewSolutions(meas.Len() + 1)
 
-	fmt.Printf("     Title       Err  [        X1         X2         X3]      C1      C2      C3      Rmean       Reff        Mre        Mim\n")
-	fmt.Printf("     -----       ---  [        --         --         --]      --      --      --      -----       ----        ---        ---\n")
+	fmt.Printf("     Title       Err  [        X1         X2         X3] [  X1%%   X2%%   X3%%]      C1      C2      C3      Rmean       Reff        Mre        Mim        Vol       Area\n")
+	fmt.Printf("     -----       ---  [        --         --         --] [   --    --    --]      --      --      --      -----       ----        ---        ---        ---       ----\n")
 	sols = DoSolve(avg, sol, db, mustlog, dep_scale, sols)
 
 	_ = *plot_psd

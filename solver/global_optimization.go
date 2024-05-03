@@ -16,22 +16,42 @@ const MAX_COMPS int = 3
 
 func GetNormL2(yh, y0 utlis.Vector, dep_scale float64) float64 {
 	tot := 0.0
+	cnt := 0
 	for i := range y0 {
 		if i == 5 {
 			tot += dep_scale * math.Pow((y0[i]-yh[i])/y0[i], 2)
+			cnt += 1
 		} else {
-			tot += math.Pow((y0[i]-yh[i])/y0[i], 2)
+			if y0[i] > 1.0e-9 {
+				tot += math.Pow((y0[i]-yh[i])/y0[i], 2)
+				cnt += 1
+			}
 		}
 	}
-	return math.Sqrt(tot) / float64(len(y0))
+
+	return math.Sqrt(tot / float64(cnt))
 }
 
-func GetNormL1(yh, y0 utlis.Vector) float64 {
+func GetNormL1(yh, y0 utlis.Vector, dep_scale float64) float64 {
 	tot := 0.0
+	cnt := 0
 	for i := range y0 {
-		tot += math.Abs((y0[i] - yh[i]) / y0[i])
+		if i == 5 {
+			tot += dep_scale * math.Abs((y0[i]-yh[i])/y0[i])
+			cnt += 1
+		} else {
+			if y0[i] > 1.0e-9 {
+				tot += math.Abs((y0[i] - yh[i]) / y0[i])
+				cnt += 1
+			}
+		}
 	}
-	return tot / float64(len(y0))
+
+	// tot := 0.0
+	// for i := range y0 {
+	// 	tot += math.Abs((y0[i] - yh[i]) / y0[i])
+	// }
+	return tot / float64(cnt)
 }
 
 func FindSolution(db *components.OpticalDB, y0 utlis.Vector, mustlog bool, dep_scale float64) SolutionType {
@@ -194,7 +214,7 @@ func FindSolutionDENM(db *components.OpticalDB, y0 utlis.Vector, mustlog bool, d
 				}
 			}
 			yh := mix.F(x)
-			return GetNormL2(yh, y0, dep_scale) + float64(penalty)
+			return GetNormL1(yh, y0, dep_scale) + float64(penalty)
 		}
 
 		xsol, yerr, _ := spso.Minimize(F, uint(MAX_COMPS))

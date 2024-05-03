@@ -25,6 +25,7 @@ func main() {
 	plot_psd := flag.Bool("psdplot", false, "Создавать графики функции распределения")
 	plot_test := flag.Bool("testplot", false, "Создавать графики сравнения измеренных данных и восстановленных")
 	dep_scale := flag.Float64("dep-scale-fact", 1.0, "Весовой коэффициент. Изменяет роль деполяризации в суммарной невязке.\nПараметр может принимать значения на отрезке [0.0, 1.0]")
+	no_b1064 := flag.Bool("no-b1064", false, "Не учитывать коэффициент обратного рассеяния на 1064 нм")
 	//rel_hum := flag.Int("hum", 0, "Относительная влажность для компонентов")
 	flag.Parse()
 
@@ -80,6 +81,9 @@ func main() {
 	sols := solver.NewSolutions(meas.Len() + 1)
 
 	displayHeader()
+	if *no_b1064 {
+		avg.Data[2] = 0.0
+	}
 	sols = DoSolve(avg, sol, db, mustlog, dep_scale, sols)
 
 	_ = *plot_psd
@@ -91,7 +95,11 @@ func main() {
 	R, _ := utlis.LogSpace(0.005, 15.0, 30)
 	for i, mi := range meas {
 
+		if *no_b1064 {
+			mi.Data[2] = 0.0
+		}
 		sols = DoSolve(mi, sol, new_db, mustlog, dep_scale, sols)
+
 		if *plot_test {
 			plots.Scatter(mi.Data, sols[i+1].Yh, "#pts", "f(x)", "Optical coefs", mi.Title+".pdf")
 		}
@@ -104,8 +112,9 @@ func main() {
 
 	fmt.Println()
 	meas = append(measurements.Measurements{avg}, meas...)
-	//fmt.Printf("%8s ", "Average")
+
 	fmt.Println("Исходные данные:")
+	fmt.Println("----------------")
 	for i := range meas {
 		fmt.Printf("%8s  ", meas[i].Title)
 	}
@@ -118,6 +127,7 @@ func main() {
 	}
 	fmt.Println()
 	fmt.Println("Восстановленные данные:")
+	fmt.Println("-----------------------")
 	//fmt.Printf("%8s ", "Average")
 	for i := range meas {
 		fmt.Printf("%8s  ", meas[i].Title)

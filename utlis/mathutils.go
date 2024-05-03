@@ -67,3 +67,27 @@ func CalcDep(b11, b22 []float64) []float64 {
 	}
 	return ret
 }
+
+// CalcStatistics вычисляет статистические параметры на основе
+// распределения числа частиц по размерам y(x)
+// rmean, reff, vol
+func CalcStatistics(x, y []float64) (float64, float64, float64) {
+	sum := 0.0
+	sum2 := 0.0
+
+	for i := 1; i < len(x); i++ {
+		sum += 0.5 * (y[i] + y[i-1]) * (x[i] - x[i-1])
+		sum2 += 0.5 * (y[i]*x[i] + y[i-1]*x[i-1]) * (x[i] - x[i-1])
+	}
+	rmean := sum2 / sum
+
+	vol := 0.0
+	area := 0.0
+
+	for i := 1; i < len(x); i++ {
+		vol += 0.5 * (4.189*y[i]*math.Pow(x[i], 3) + 4.189*y[i-1]*math.Pow(x[i-1], 3)) * (x[i] - x[i-1])
+		area += 0.5 * (12.57*y[i]*math.Pow(x[i], 2) + 12.57*y[i-1]*math.Pow(x[i-1], 2)) * (x[i] - x[i-1])
+	}
+
+	return rmean, vol / (3.0 * area), vol
+}

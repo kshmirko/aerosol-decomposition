@@ -15,6 +15,7 @@ import (
 
 const R_MIN = 0.005
 const R_MAX = 15.0
+const NPTS = 30
 
 func main() {
 	inpfile := flag.String("in", "data.txt", "Имя файла с данными")
@@ -26,7 +27,6 @@ func main() {
 	plot_test := flag.Bool("testplot", false, "Создавать графики сравнения измеренных данных и восстановленных")
 	dep_scale := flag.Float64("dep-scale-fact", 1.0, "Весовой коэффициент. Изменяет роль деполяризации в суммарной невязке.\nПараметр может принимать значения на отрезке [0.0, 1.0]")
 	no_b1064 := flag.Bool("no-b1064", false, "Не учитывать коэффициент обратного рассеяния на 1064 нм")
-	//rel_hum := flag.Int("hum", 0, "Относительная влажность для компонентов")
 	flag.Parse()
 
 	var db components.OpticalDB
@@ -62,11 +62,13 @@ func main() {
 	// Выводим информацию об используемых типах
 	db.PrintTable()
 
+	// Загружаем файл с компонентами
 	keys, err := components.LoadKeys(*keysfile)
 	if err != nil {
 		log.Fatal(err)
 	}
 	db = db.Filter(keys)
+
 	// Загружаем информацию об измерениях
 	meas, err := measurements.LoadFromFile(*inpfile)
 
@@ -76,6 +78,7 @@ func main() {
 
 	meas.Print()
 
+	// Осредняем измерения
 	avg := meas.MakeAverage()
 	avg.Print1()
 	sols := solver.NewSolutions(meas.Len() + 1)
@@ -92,7 +95,7 @@ func main() {
 	}
 
 	new_db := db
-	R, _ := utlis.LogSpace(0.005, 15.0, 30)
+	R, _ := utlis.LogSpace(R_MIN, R_MAX, NPTS)
 	for i, mi := range meas {
 
 		if *no_b1064 {

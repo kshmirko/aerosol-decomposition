@@ -7,7 +7,7 @@ import (
 	"gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
 )
 
-// Описывает оптические коэффициенты обной моды вместе в параметрами распределения
+// Описывает оптические коэффициенты одной моды вместе в параметрами распределения
 type OpticalCoefs struct {
 	AerosolMode `json:"aerosol_mode,omitempty"`
 	Rh          int          `json:"rh"`
@@ -83,22 +83,12 @@ func (am AerosolModeMixItem) Backscatter22() utlis.Vector {
 
 // RefrReIdx - действительная часть коэффициента преломления
 func (am AerosolModeMixItem) RefrReIdx() utlis.Vector {
-	// ret := make(utlis.Vector, DIM_SIZE)
-	// vol := am.Volume()
-	// for i, m := range am.MRe {
-	// 	ret[i] = vol * m
-	// }
 
 	return am.OpticalCoefs.MRe
 }
 
 // RefrImIdx - мнимая часть коэффициента преломления
 func (am AerosolModeMixItem) RefrImIdx() utlis.Vector {
-	// ret := make(utlis.Vector, DIM_SIZE)
-	// vol := am.Volume()
-	// for i, m := range am.MIm {
-	// 	ret[i] = vol * m
-	// }
 	return am.OpticalCoefs.MIm
 }
 
@@ -107,13 +97,13 @@ func (am AerosolModeMixItem) Number() float64 {
 }
 
 func (db OpticalDB) PrintTable() {
-	fmt.Printf("%4s %10s %10s %10s %7s %7s\n", "#", "Title", "Reff", "Rmean", "MRe", "MIm")
-	fmt.Printf("%4s %10s %10s %10s %7s %7s\n", "-", "-----", "----", "-----", "---", "---")
+	fmt.Printf("%4s %10s %10s %10s %10s %7s %7s\n", "#", "Title", "RH", "Reff", "Rmean", "MRe", "MIm")
+	fmt.Printf("%4s %10s %10s %10s %10s %7s %7s\n", "-", "-----", "--", "----", "-----", "---", "---")
 
 	for i, dbi := range db {
-		fmt.Printf("%4d %10s %10.4f %10.4f %7.3f %7.4f\n", i, dbi.Title, dbi.AerosolMode.EffectiveRadius(), dbi.AerosolMode.MeanRadius(), dbi.MRe[1], dbi.MIm[1])
+		fmt.Printf("%4d %10s %10d %10.4f %10.4f %7.3f %7.4f\n", i, dbi.Title, dbi.Rh, dbi.AerosolMode.EffectiveRadius(), dbi.AerosolMode.MeanRadius(), dbi.MRe[1], dbi.MIm[1])
 	}
-	fmt.Printf("-----------------------------------------------------\n\n")
+	fmt.Printf("----------------------------------------------------------------\n\n")
 }
 
 func (db OpticalDB) Filter(keys ElemKeys) OpticalDB {

@@ -18,6 +18,7 @@ const R_MAX = 15.0
 const NPTS = 30
 
 func main() {
+
 	inpfile := flag.String("in", "data.txt", "Имя файла с данными")
 	algorithm := flag.String("alg", "denm", "Название используемого алгоритма spso или de или denm. \nspso - метод роя частиц, \nde - метод дифференциальной эволюции, \ndenm - метод дифференциальной эфолюции + уточнение симплекс-методом.")
 	mustlog := flag.Bool("log", false, "Показывать лог работы алгоритма?")
@@ -32,13 +33,11 @@ func main() {
 	var db components.OpticalDB
 	var err error
 
-	//if db, err = components.LoadDB(*dbfile); err != nil {
 	if *use_aggls {
 		db = components.GenerateDBAggl()
 	} else {
 		db = components.GenerateDB()
 	}
-	//}
 
 	if *dep_scale < 0 {
 		*dep_scale = 0.0
@@ -55,9 +54,9 @@ func main() {
 	} else if strings.ToLower(*algorithm) == "denm" {
 		sol = solver.FindSolutionDENM
 	} else {
-		log.Fatal("Неизвстный алгоритм")
+		log.Fatal("Неизвстный алгоритм, читайте внимательно документацию")
 	}
-	fmt.Printf("\nВ качестве решателя используется алгоритм %s\n", *algorithm)
+	fmt.Printf("\nВ качестве решателя используется алгоритм %s\n\n", *algorithm)
 
 	// Выводим информацию об используемых типах
 	db.PrintTable()
@@ -72,6 +71,12 @@ func main() {
 	// Загружаем информацию об измерениях
 	meas, err := measurements.LoadFromFile(*inpfile)
 
+	if *no_b1064 {
+		for i := range meas {
+			meas[i].Data[2] = 0.0
+		}
+	}
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,13 +85,13 @@ func main() {
 
 	// Осредняем измерения
 	avg := meas.MakeAverage()
-	avg.Print1()
 	sols := solver.NewSolutions(meas.Len() + 1)
+	// if *no_b1064 {
+	// 	avg.Data[2] = 0.0
+	// }
+	avg.Print1()
 
 	displayHeader()
-	if *no_b1064 {
-		avg.Data[2] = 0.0
-	}
 	sols = DoSolve(avg, sol, db, mustlog, dep_scale, sols)
 
 	_ = *plot_psd
@@ -98,9 +103,9 @@ func main() {
 	R, _ := utlis.LogSpace(R_MIN, R_MAX, NPTS)
 	for i, mi := range meas {
 
-		if *no_b1064 {
-			mi.Data[2] = 0.0
-		}
+		// if *no_b1064 {
+		// 	mi.Data[2] = 0.0
+		// }
 		sols = DoSolve(mi, sol, new_db, mustlog, dep_scale, sols)
 
 		if *plot_test {

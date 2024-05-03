@@ -112,7 +112,7 @@ func PlotXY(x, y utlis.Vector, xlab, ylab, title, fname string) error {
 	p.X.Tick.Marker = plot.LogTicks{Prec: 3}
 	p.X.Label.Text = xlab
 	p.Y.Label.Text = ylab
-
+	p.Add(plotter.NewGrid())
 	plotter.DefaultLineStyle.Width = vg.Points(1)
 	plotter.DefaultGlyphStyle.Radius = vg.Points(3)
 

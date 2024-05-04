@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
+	"github.com/olekukonko/tablewriter"
 )
 
 const MAX_SIZE int = 6
@@ -99,11 +100,26 @@ func (m Measurements) MakeAverage() Measurement {
 }
 
 func (m Measurements) Print() {
-	fmt.Printf("  Title 	[ b355     b532     b1064    e355     e532     d532   ]\n")
-	fmt.Printf("-----------------------------------------------------------------------\n")
-	for _, mi := range m {
-		mi.Print()
-	}
-	fmt.Printf("-----------------------------------------------------------------------\n\n")
+	tbl := tablewriter.NewWriter(os.Stdout)
 
+	tbl.SetHeader([]string{"Title", "b355", "b532", "b1064", "e355", "e532", "d532"})
+	tbl.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+	tbl.SetCenterSeparator("|")
+	//fmt.Printf("  Title 	[ b355     b532     b1064    e355     e532     d532   ]\n")
+	//fmt.Printf("-----------------------------------------------------------------------\n")
+	for _, mi := range m {
+		tbl.Append(
+			[]string{mi.Title,
+				fmt.Sprintf("%.2e", mi.Data[0]),
+				fmt.Sprintf("%.2e", mi.Data[1]),
+				fmt.Sprintf("%.2e", mi.Data[2]),
+				fmt.Sprintf("%.2e", mi.Data[3]),
+				fmt.Sprintf("%.2e", mi.Data[4]),
+				fmt.Sprintf("%.2e", mi.Data[5])},
+		)
+	}
+	tbl.SetCaption(true, "Исходные данные")
+	//fmt.Printf("-----------------------------------------------------------------------\n\n")
+	tbl.Render()
+	fmt.Println()
 }

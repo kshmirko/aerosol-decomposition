@@ -2,9 +2,11 @@ package components
 
 import (
 	"fmt"
+	"os"
 	"slices"
 
 	"gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
+	"github.com/olekukonko/tablewriter"
 )
 
 // Описывает оптические коэффициенты одной моды вместе в параметрами распределения
@@ -97,13 +99,27 @@ func (am AerosolModeMixItem) Number() float64 {
 }
 
 func (db OpticalDB) PrintTable() {
-	fmt.Printf("%4s %10s %10s %10s %10s %7s %7s\n", "#", "Title", "RH", "Reff", "Rmean", "MRe", "MIm")
-	fmt.Printf("%4s %10s %10s %10s %10s %7s %7s\n", "-", "-----", "--", "----", "-----", "---", "---")
 
+	tbl := tablewriter.NewWriter(os.Stdout)
+	tbl.SetHeader([]string{"#", "Title", "RH", "Reff", "Rmean", "MRe", "Mim"})
+	tbl.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
+	tbl.SetCenterSeparator("|")
+
+	tbl.SetAlignment(tablewriter.ALIGN_RIGHT)
 	for i, dbi := range db {
-		fmt.Printf("%4d %10s %10d %10.4f %10.4f %7.3f %7.4f\n", i, dbi.Title, dbi.Rh, dbi.AerosolMode.EffectiveRadius(), dbi.AerosolMode.MeanRadius(), dbi.MRe[1], dbi.MIm[1])
+		tbl.Append([]string{
+			fmt.Sprintf("%4d", i),
+			dbi.Title,
+			fmt.Sprintf("%d", dbi.Rh),
+			fmt.Sprintf("%.4f", dbi.AerosolMode.EffectiveRadius()),
+			fmt.Sprintf("%.4f", dbi.AerosolMode.MeanRadius()),
+			fmt.Sprintf("%.3f", dbi.MRe[1]),
+			fmt.Sprintf("%.4f", dbi.MIm[1]),
+		})
 	}
-	fmt.Printf("----------------------------------------------------------------\n\n")
+	tbl.SetCaption(true, "База данных")
+	tbl.Render()
+	fmt.Println()
 }
 
 func (db OpticalDB) Filter(keys ElemKeys) OpticalDB {

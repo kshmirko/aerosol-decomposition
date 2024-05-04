@@ -81,45 +81,31 @@ func main() {
 		log.Fatal(err)
 	}
 
-	meas.Print()
-
 	// Осредняем измерения
 	avg := meas.MakeAverage()
-	sols := solver.NewSolutions(meas.Len() + 1)
-	// if *no_b1064 {
-	// 	avg.Data[2] = 0.0
-	// }
-	avg.Print1()
+	meas = append(measurements.Measurements{avg}, meas...)
+	meas.Print()
+	sols := solver.NewSolutions(meas.Len())
 
-	displayHeader()
-	sols = DoSolve(avg, sol, db, mustlog, dep_scale, sols)
-
-	_ = *plot_psd
-	if *plot_test {
-		plots.PlotY(avg.Data, sols[0].Yh, "#pts", "f(x)", "Optical coefs", avg.Title+".pdf")
-	}
+	//displayHeader()
 
 	new_db := db
 	R, _ := utlis.LogSpace(R_MIN, R_MAX, NPTS)
 	for i, mi := range meas {
 
-		// if *no_b1064 {
-		// 	mi.Data[2] = 0.0
-		// }
 		sols = DoSolve(mi, sol, new_db, mustlog, dep_scale, sols)
 
 		if *plot_test {
-			plots.Scatter(mi.Data, sols[i+1].Yh, "#pts", "f(x)", "Optical coefs", mi.Title+".pdf")
+			plots.Scatter(mi.Data, sols[i].Yh, "#pts", "f(x)", "Optical coefs", mi.Title+".pdf")
 		}
 
 		if *plot_psd {
-			Y := sols[i+1].Mix.ValueVol(R)
+			Y := sols[i].Mix.ValueVol(R)
 			plots.PlotXY(R, Y, "Radius, um", "dV/dr", "Volume distribution", "psd-"+mi.Title+".pdf")
 		}
 	}
-
 	fmt.Println()
-	meas = append(measurements.Measurements{avg}, meas...)
+	sols.Print()
 
 	fmt.Println("Исходные данные:")
 	fmt.Println("----------------")
@@ -136,7 +122,6 @@ func main() {
 	fmt.Println()
 	fmt.Println("Восстановленные данные:")
 	fmt.Println("-----------------------")
-	//fmt.Printf("%8s ", "Average")
 	for i := range meas {
 		fmt.Printf("%8s  ", meas[i].Title)
 	}
@@ -150,11 +135,6 @@ func main() {
 
 }
 
-func displayHeader() {
-	fmt.Printf("     Title       Err  [        X1         X2         X3] [  X1%%   X2%%   X3%%]      C1      C2      C3      Rmean       Reff        Mre        Mim        Vol       Area\n")
-	fmt.Printf("     -----       ---  [        --         --         --] [   --    --    --]      --      --      --      -----       ----        ---        ---        ---       ----\n")
-}
-
 func DoSolve(mi measurements.Measurement,
 	sol func(db *components.OpticalDB, y0 utlis.Vector, mustlog bool, dep_scale float64) solver.SolutionType,
 	db components.OpticalDB,
@@ -163,8 +143,9 @@ func DoSolve(mi measurements.Measurement,
 	sols solver.Solutions) solver.Solutions {
 
 	ret := sol(&db, mi.Data, *mustlog, *dep_scale)
+	ret.TitleSol = mi.Title
 
 	sols = append(sols, ret)
-	ret.Print(mi.Title)
+	//ret.Print()
 	return sols
 }

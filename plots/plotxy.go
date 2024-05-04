@@ -5,9 +5,13 @@ import (
 
 	"gitflic.ru/project/physicist2018/aerosol-decomposition/utlis"
 	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/font"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
 )
+
+const CANVAS_X int = 10
+const CANVAS_Y int = 10
 
 func PlotY(y, yh utlis.Vector, xlab, ylab, title, fname string) error {
 	p := plot.New()
@@ -97,7 +101,7 @@ func Scatter(y, yh utlis.Vector, xlab, ylab, title, fname string) error {
 	}
 	p.Add(scatter, line)
 
-	err = p.Save(10*vg.Centimeter, 10*vg.Centimeter, fname)
+	err = p.Save(font.Length(CANVAS_X)*vg.Centimeter, font.Length(CANVAS_Y)*vg.Centimeter, fname)
 	if err != nil {
 		log.Panic(err)
 	}

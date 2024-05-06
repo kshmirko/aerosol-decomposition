@@ -98,6 +98,7 @@ func (am AerosolModeMixItem) Number() float64 {
 	return am.N
 }
 
+// PrintTable - Печатает таблицу с данными аэрозольных компонентов в стантартное устройство вывода
 func (db OpticalDB) PrintTable() {
 
 	tbl := tablewriter.NewWriter(os.Stdout)

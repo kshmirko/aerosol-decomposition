@@ -6,6 +6,7 @@ require (
 	github.com/MaxHalford/eaopt v0.4.2
 	github.com/crhntr/neldermead v0.1.2
 	github.com/mxschmitt/golang-combinations v1.2.0
+	github.com/olekukonko/tablewriter v0.0.5
 	gonum.org/v1/plot v0.14.0
 )
 
@@ -17,6 +18,7 @@ require (
 	github.com/go-latex/latex v0.0.0-20230307184459-12ec69307ad9 // indirect
 	github.com/go-pdf/fpdf v0.8.0 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
+	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/image v0.11.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect

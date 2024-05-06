@@ -20,7 +20,13 @@ const NPTS = 30
 func main() {
 
 	inpfile := flag.String("in", "data.txt", "Имя файла с данными")
-	algorithm := flag.String("alg", "denm", "Название используемого алгоритма spso или de или denm. \nspso - метод роя частиц, \nde - метод дифференциальной эволюции, \ndenm - метод дифференциальной эфолюции + уточнение симплекс-методом.")
+	algorithm := flag.String("alg", "DENM", "Название используемого алгоритма spso или de или denm. "+
+		"\nSPSO - метод роя частиц, "+
+		"\nDE - метод дифференциальной эволюции, "+
+		"\nDENM - метод дифференциальной эволюции + уточнение симплекс-методом, "+
+		"\nDELBFGS - метод дифференциальной эволюции + уточнение LBFGS,"+
+		"\nDEBFGS - метод дифференциальной эволюции + уточнение BFGS"+
+		"\nDEGD - метод дифференциальной эволюции + уточнение градиентным спуском")
 	mustlog := flag.Bool("log", false, "Показывать лог работы алгоритма?")
 	use_aggls := flag.Bool("aggls", false, "Использовать агломераты обломков для моделирования минерального аэрозоля?")
 	keysfile := flag.String("keys", "KEYS.txt", "Файл с наименованием исспользуемых компонентов")
@@ -53,6 +59,12 @@ func main() {
 		sol = solver.FindSolutionDE
 	} else if strings.ToLower(*algorithm) == "denm" {
 		sol = solver.FindSolutionDENM
+	} else if strings.ToLower(*algorithm) == "delbfgs" {
+		sol = solver.FindSolutionDELBFGS
+	} else if strings.ToLower(*algorithm) == "debfgs" {
+		sol = solver.FindSolutionDEBFGS
+	} else if strings.ToLower(*algorithm) == "degd" {
+		sol = solver.FindSolutionDEBFGS
 	} else {
 		log.Fatal("Неизвстный алгоритм, читайте внимательно документацию")
 	}

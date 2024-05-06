@@ -15,6 +15,7 @@ type SolutionType struct {
 	Mix      components.AerosolModeMix
 	Xsol     utlis.Vector
 	Xfrac    utlis.Vector
+	Vfrac    utlis.Vector
 	Yh       utlis.Vector
 	Err      float64
 }
@@ -39,9 +40,23 @@ func (st *SolutionType) MakeFractions() {
 	}
 }
 
+func (st *SolutionType) MakeVFractions() {
+
+	(*st).Vfrac = make(utlis.Vector, len(st.Xsol))
+	total := 0.0
+	for _, x := range (*st).Mix {
+		total += x.Volume()
+	}
+
+	for i, x := range (*st).Mix {
+		st.Vfrac[i] = x.Volume() / total * 100
+	}
+}
+
 func (st SolutionType) Print() {
 
 	st.MakeFractions()
+	st.MakeVFractions()
 	fmt.Printf("%10s %10.1f %10.2f %5.2f %7s %7s %7s %10.3f %10.3f %10.3f %10.3f %10.2f %10.2f\n",
 		st.TitleSol, st.Err*100, st.Xsol, st.Xfrac, st.Mix[0].Title, st.Mix[1].Title, st.Mix[2].Title,
 		st.Mix.MeanRadius(), st.Mix.EffectiveRadius(), st.Mix.RefrReIdx()[1], st.Mix.RefrImIdx()[1],
@@ -66,13 +81,14 @@ func (st *Solutions) Print() {
 		"X1", "X2", "X3",
 		"X1%", "X2%", "X3%",
 		"C1", "C2", "C3",
-		"Rmean", "Reff", "Mre", "MIm", "Vol", "Area",
+		"Rmean", "Reff", "Mre", "MIm", "V1%", "V2%", "V3%", "Vol", "Area",
 	})
 	tbl.SetBorders(tablewriter.Border{Left: true, Top: false, Right: true, Bottom: false})
 	tbl.SetCenterSeparator("|")
 
 	for _, sti := range *st {
 		sti.MakeFractions()
+		sti.MakeVFractions()
 		tbl.Append([]string{
 			sti.TitleSol,
 			fmt.Sprintf("%.1f", sti.Err*100.0),
@@ -89,6 +105,9 @@ func (st *Solutions) Print() {
 			fmt.Sprintf("%.3f", sti.Mix.EffectiveRadius()),
 			fmt.Sprintf("%.3f", sti.Mix.RefrReIdx()[1]),
 			fmt.Sprintf("%.3f", sti.Mix.RefrImIdx()[1]),
+			fmt.Sprintf("%.3f", sti.Vfrac[0]),
+			fmt.Sprintf("%.3f", sti.Vfrac[1]),
+			fmt.Sprintf("%.3f", sti.Vfrac[2]),
 			fmt.Sprintf("%.3f", sti.Mix.Volume()),
 			fmt.Sprintf("%.3f", sti.Mix.Area()),
 		})

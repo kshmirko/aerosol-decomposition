@@ -513,22 +513,6 @@ func FindSolutionDEGD(db *components.OpticalDB, y0 utlis.Vector, mustlog bool, d
 		var meth = &optimize.GradientDescent{}
 		xsol1, err := optimize.Minimize(p, xsol, nil, meth)
 
-		// opts := neldermead.NewOptions()
-		// opts.Constraints = []neldermead.Constraint{
-		// 	{
-		// 		Min: 0.0,
-		// 		Max: 1000000.0,
-		// 	},
-		// 	{
-		// 		Min: 0.0,
-		// 		Max: 1000000.0,
-		// 	},
-		// 	{
-		// 		Min: 0.0,
-		// 		Max: 1000000.0,
-		// 	},
-		// }
-
 		// xsol1, err := neldermead.Run(F, xsol, opts)
 		if mustlog {
 			log.Printf("Номер тройки: %d, %d\n", i, len(cmb))

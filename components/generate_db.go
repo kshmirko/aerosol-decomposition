@@ -166,6 +166,48 @@ func GenerateDB() OpticalDB {
 			MRe: utils.Vector{1.530e+00, 1.530e+00, 1.530e+00},
 			MIm: utils.Vector{1.700e-02, 5.500e-03, 4.000e-03},
 		},
+		OpticalCoefs{
+			AerosolMode: AerosolMode{
+				Title: "MIN1",
+				Rm:    0.18,
+				Sigma: 1.28,
+			},
+			Rh:  0,
+			Wvl: utils.Vector{0.355, 0.532, 1.064},
+			Ext: utils.Vector{5.39e-6, 3.95e-6, 1.53e-6},
+			Bck: utils.Vector{1.34e-7, 7.14e-8, 2.83e-8},
+			B22: utils.Vector{1.32e-7, 7.09e-8, 2.82e-8},
+			MRe: utils.Vector{1.53, 1.53, 1.53},
+			MIm: utils.Vector{1.7e-2, 5.5e-3, 4.0e-3},
+		},
+		OpticalCoefs{
+			AerosolMode: AerosolMode{
+				Title: "MIA1",
+				Rm:    0.59,
+				Sigma: 1.23,
+			},
+			Rh:  0,
+			Wvl: utils.Vector{0.355, 0.532, 1.064},
+			Ext: utils.Vector{8.11e-6, 7.14e-6, 6.03e-6},
+			Bck: utils.Vector{1.77e-7, 1.66e-7, 8.22e-8},
+			B22: utils.Vector{1.58e-7, 1.18e-7, 5.65e-8},
+			MRe: utils.Vector{1.53, 1.53, 1.53},
+			MIm: utils.Vector{1.7e-2, 5.3e-3, 4.0e-3},
+		},
+		OpticalCoefs{
+			AerosolMode: AerosolMode{
+				Title: "MIC1",
+				Rm:    1.04,
+				Sigma: 1.45,
+			},
+			Rh:  0,
+			Wvl: utils.Vector{0.355, 0.532, 1.064},
+			Ext: utils.Vector{1.61e-5, 1.52e-5, 1.48e-5},
+			Bck: utils.Vector{1.90e-7, 3.19e-7, 4.01e-7},
+			B22: utils.Vector{1.71e-7, 2.83e-7, 2.24e-7},
+			MRe: utils.Vector{1.53, 1.53, 1.53},
+			MIm: utils.Vector{1.7e-2, 5.3e-3, 4.0e-3},
+		},
 	}
 	// fmt.Printf("Размер БД = %d\n\n", len(db))
 	// content, err := json.MarshalIndent(db, "", "  ")
